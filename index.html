@@ -1,1 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Edexcel FS Maths L1 — Past Paper 10 Interactive Quiz</title>
+
+<style>
+  :root{
+    --ink:#0f172a; --muted:#64748b; --accent:#2563eb; --bg:#ffffff; --border:#e5e7eb;
+    --nc:#16a34a; --calc:#7c3aed; --tabh:56px;
+    --redbg:#fee2e2; --redfg:#7f1d1d; --orbg:#ffedd5; --orfg:#7c2d12; --grbg:#dcfce7; --grfg:#065f46;
+  }
+  html,body{
+    margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  }
+  header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--border)}
+  main{max-width:1040px;margin:1.1rem auto;padding:0 1rem 5rem}
+
+  /* tab bar */
+  .bar{
+    display:flex;gap:.5rem;align-items:center;overflow:auto hidden;white-space:nowrap;
+    height:var(--tabh);padding:.65rem .75rem
+  }
+  .bar .split{
+    font-size:.9rem;font-weight:800;color:#111;background:#f8fafc;
+    border:1px solid var(--border);border-radius:.4rem;padding:.35rem .6rem;flex:0 0 auto
+  }
+  .bar .split.nc{color:#065f46;border-color:#bbf7d0;background:#ecfdf5}
+  .bar .split.calc{color:#4c1d95;border-color:#ddd6fe;background:#f5f3ff}
+  .bar button{
+    appearance:none;border:1px solid var(--border);background:#fff;color:#0f172a;
+    border-radius:999px;padding:.45rem .9rem;cursor:pointer;font-weight:700;transition:.15s;flex:0 0 auto
+  }
+  .bar button:hover{border-color:#c7d2fe}
+  .bar button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  section.page{display:none;animation:fade .12s ease-out}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:.45;transform:translateY(-2px)}to{opacity:1;transform:none}}
+
+  .qpanel{
+    border:1px solid var(--border);border-radius:.8rem;overflow:hidden;margin-top:.9rem;
+    box-shadow:0 1px 0 rgba(0,0,0,.03)
+  }
+  .qhead{
+    padding:.8rem 1rem;border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#fbfdff,#f8fafc);
+    display:flex;align-items:center;justify-content:space-between;gap:.6rem
+  }
+  .qhead h3{margin:.15rem 0;font-size:1.05rem}
+  .badge{display:inline-block;margin-left:.5rem;padding:.05rem .45rem;border:1px solid var(--border);border-radius:6px;background:#eef2ff}
+  .tag{font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+  .tag.nc{color:var(--nc)}
+  .tag.calc{color:var(--calc)}
+  .qbody{padding:.75rem 1rem 1rem}
+  .muted{color:var(--muted)}
+  .primary{background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:.45rem;padding:.55rem 1rem;cursor:pointer}
+
+  input[type="text"],input[type="number"],select,textarea{
+    padding:.35rem .5rem;border:1px solid var(--border);border-radius:.4rem;min-width:64px;
+    font:inherit
+  }
+  input::placeholder{color:#9aa3b2}
+  textarea{width:100%;min-height:60px;resize:vertical}
+  table{border-collapse:collapse;width:100%}
+  th,td{border:1px solid var(--border);padding:.45rem .55rem;text-align:left;vertical-align:middle}
+  th{background:#f3f4f6}
+  .svgwrap{display:flex;justify-content:center;align-items:center;margin:.55rem 0}
+
+  /* timer pill */
+  #timerPill{
+    position:fixed;right:12px;top:8px;background:#0f172a;color:#fff;border-radius:999px;
+    padding:.35rem .7rem;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.15);display:none;z-index:60
+  }
+  #timerPill.up{background:#dc2626}
+
+  /* heatmap */
+  .heat th{background:#f8fafc}
+  .heat td.status{font-weight:700;text-align:center}
+  .mark-red{background:var(--redbg);color:var(--redfg)}
+  .mark-orange{background:var(--orbg);color:var(--orfg)}
+  .mark-green{background:var(--grbg);color:var(--grfg)}
+
+  /* modal */
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);z-index:1000}
+  .modal .panel{
+    width:min(940px,96vw);background:#fff;border:1px solid var(--border);border-radius:.8rem;padding:1.1rem
+  }
+  .modal h2{margin:.2rem 0 .4rem}
+  .modal .warn{
+    background:#eef2ff;border:1px solid #c7d2fe;color:#1e3a8a;border-radius:.5rem;
+    padding:.65rem .7rem;margin:.6rem 0
+  }
+  .modal .row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+  .modal .radio{display:flex;gap:.4rem;align-items:center}
+  .modal input[type="number"]{width:100px}
+
+  /* formula sheet */
+  .fs-open{border:1px solid var(--border);background:#f8fafc;border-radius:.45rem;padding:.3rem .6rem;font-weight:700;cursor:pointer}
+  #fsGrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:16px;align-items:start}
+  #fsGrid h4{margin:.6rem 0 .35rem}
+  #fsGrid .box{border:1px solid var(--border);border-radius:.5rem;padding:.6rem .7rem;background:#fbfdff}
+  #fsClose{float:right}
+  .fs-note{font-size:.92rem;color:#374151;margin:.15rem 0 .6rem}
+
+  .stack{display:flex;flex-direction:column;gap:.35rem}
+
+  /* simple L-shape diagram */
+  .dim-label{font-size:12px;fill:#111}
+
+  /* bar chart (B5) */
+  #b5svg text{font-size:12px;fill:#111}
+  #b5svg .handle{cursor:pointer}
+
+  /* B4 probability scale */
+  #B4scale text{font-size:12px;fill:#111}
+  #B4scale .tick{cursor:pointer}
+
+  /* cards in results */
+  .actions button{margin-right:.4rem;margin-bottom:.4rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar" id="tabbar" role="tablist" aria-label="Quick navigation">
+    <span class="split nc" aria-hidden="true">NON‑CALCULATOR (A1–A4)</span>
+    <button class="active" data-target="A1" role="tab" aria-selected="true">A1</button>
+    <button data-target="A2" role="tab">A2</button>
+    <button data-target="A3" role="tab">A3</button>
+    <button data-target="A4" role="tab">A4</button>
+
+    <span class="split calc" aria-hidden="true">CALCULATOR (B1–B11)</span>
+    <button data-target="B1" role="tab">B1</button>
+    <button data-target="B2" role="tab">B2</button>
+    <button data-target="B3" role="tab">B3</button>
+    <button data-target="B4" role="tab">B4</button>
+    <button data-target="B5" role="tab">B5</button>
+    <button data-target="B6" role="tab">B6</button>
+    <button data-target="B7" role="tab">B7</button>
+    <button data-target="B8" role="tab">B8</button>
+    <button data-target="B9" role="tab">B9</button>
+    <button data-target="B10" role="tab">B10</button>
+    <button data-target="B11" role="tab">B11</button>
+    <button data-target="results" role="tab">Results</button>
+  </div>
+</header>
+
+<div id="timerPill" aria-live="polite">⏱ 00:00</div>
+
+<main>
+
+<!-- ================= SECTION A ================= -->
+
+<section id="A1" class="page active" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>A1 — Holiday survey & percentage of an amount <span class="badge">[3 marks]</span></h3>
+      <span class="tag nc">NON‑CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Samira reads the results of a holiday survey.</p>
+      <p><i>We asked 860 people about their holidays. 15% of these people said that Greece was their favourite holiday destination.</i></p>
+      <p>Samira thinks that more than 100 people said that Greece was their favourite holiday destination.</p>
+      <p>(a) Work out how many people said that Greece was their favourite holiday destination.</p>
+      <p>Number of people: <input id="A1_count" type="number" /> </p>
+      <p>(b) Is Samira correct?</p>
+      <p>
+        <select id="A1_correct">
+          <option value=""></option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </p>
+      <p class="muted">You can use the box below for working (not marked automatically).</p>
+      <textarea id="A1_work" placeholder="Show your working here..."></textarea>
+    </div>
+  </div>
+</section>
+
+<section id="A2" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>A2 — Time & shifts <span class="badge">[3 marks]</span></h3>
+      <span class="tag nc">NON‑CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Norbert is a doctor.</p>
+      <ul>
+        <li>He starts his first shift of the week on <b>Monday at 8 pm</b>.</li>
+        <li>The shift lasts <b>12 hours</b>.</li>
+        <li>He then has <b>30 hours</b> off work.</li>
+        <li>He then starts his second shift of the week.</li>
+      </ul>
+      <p>Work out the <b>day</b> and <b>time</b> Norbert starts his second shift.</p>
+      <p>Time (24‑hour, e.g. 14:00): <input id="A2_time" type="text" placeholder="HH:MM" size="8" /></p>
+      <p>Day:
+        <select id="A2_day">
+          <option value=""></option>
+          <option>Monday</option>
+          <option>Tuesday</option>
+          <option>Wednesday</option>
+          <option>Thursday</option>
+          <option>Friday</option>
+          <option>Saturday</option>
+          <option>Sunday</option>
+        </select>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="A3" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>A3 — Range, rounding & units <span class="badge">[4 marks]</span></h3>
+      <span class="tag nc">NON‑CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Here are some numbers.</p>
+      <p><b>147  &nbsp; 116  &nbsp; 213  &nbsp; 394  &nbsp; 178  &nbsp; 312</b></p>
+      <p>(a) Work out the <b>range</b> of these numbers.</p>
+      <p>Range: <input id="A3_range" type="number" /></p>
+      <p>(b) Round <b>4.749</b> to <b>1 decimal place</b>.</p>
+      <p><input id="A3_round" type="text" size="6" /></p>
+      <p>(c) Convert <b>0.9 kilogram</b> into grams.</p>
+      <p><input id="A3_grams" type="number" /> g</p>
+    </div>
+  </div>
+</section>
+
+<section id="A4" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>A4 — Ratio & estimation with a check <span class="badge">[4 marks]</span></h3>
+      <span class="tag nc">NON‑CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Zac is a hotel manager.</p>
+      <ul>
+        <li><b>3 out of every 5</b> guests usually order room service on a Saturday.</li>
+        <li>There are <b>624 guests</b> staying at the hotel this Saturday.</li>
+      </ul>
+      <p>(a) Use <b>estimation</b> to work out the number of guests Zac expects to order room service this Saturday.</p>
+      <p>Estimated number of guests: <input id="A4_guests" type="number" /></p>
+      <p>(b) Use a <b>reverse calculation</b> to show a check of your answer.</p>
+      <p>Which reverse calculation is correct?</p>
+      <p>
+        <select id="A4_check">
+          <option value=""></option>
+          <option value="rev1">Your answer &times; 3 &divide; 5 &approx; 624</option>
+          <option value="rev2">Your answer &divide; 3 &times; 5 &approx; 624</option>
+          <option value="rev3">Your answer &divide; 5 &times; 3 &approx; 624</option>
+        </select>
+      </p>
+      <p class="muted">In the real exam, you would write your full working. Here we just record the key answer and a suitable check.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SECTION B ================= -->
+
+<section id="B1" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B1 — Company profits & ordering decimals <span class="badge">[3 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Inka looks at performance reports for 2020 from three companies.</p>
+      <ul>
+        <li>Company A made <b>three quarters of a million pounds</b> profit.</li>
+        <li>Company B made <b>£648 900</b> profit.</li>
+        <li>Company C made <b>seven hundred and twenty‑five thousand pounds</b> profit.</li>
+      </ul>
+      <p>(a) Write the profits for company A and C using digits, then decide which company made the most profit.</p>
+      <p>Company A profit: £ <input id="B1_A_profit" type="number" /></p>
+      <p>Company C profit: £ <input id="B1_C_profit" type="number" /></p>
+      <p>Company with the most profit:
+        <select id="B1_most">
+          <option value=""></option>
+          <option value="A">Company A</option>
+          <option value="B">Company B</option>
+          <option value="C">Company C</option>
+        </select>
+      </p>
+      <hr>
+      <p>Here are some numbers.</p>
+      <p><b>2.89 &nbsp; 2.39 &nbsp; 3.09 &nbsp; 2.41 &nbsp; 2.9</b></p>
+      <p>(b) Write these numbers in order of size, starting with the smallest.</p>
+      <p>Order (use commas or spaces): <input id="B1_order" type="text" style="width:260px" placeholder="e.g. 1.2, 1.6, 2.5" /></p>
+    </div>
+  </div>
+</section>
+
+<section id="B2" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B2 — Percentages & comparison (golf games) <span class="badge">[4 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Alex and Seamus play golf.</p>
+      <ul>
+        <li>Alex played <b>90</b> games and won <b>60%</b> of them.</li>
+        <li>Seamus played <b>80</b> games and won <b>55%</b> of them.</li>
+      </ul>
+      <p>Alex thinks that last year she won <b>12 more games</b> than Seamus did.</p>
+      <p>(a) Games Alex won: <input id="B2_A_wins" type="number" /></p>
+      <p>(b) Games Seamus won: <input id="B2_S_wins" type="number" /></p>
+      <p>(c) How many more games did Alex win than Seamus? <input id="B2_diff" type="number" /></p>
+      <p>(d) Is Alex correct?</p>
+      <p>
+        <select id="B2_correct">
+          <option value=""></option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="B3" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B3 — Wooden flooring in an L‑shaped room <span class="badge">[5 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Akeem wants to put wooden flooring in a room. He has this sketch of the floor.</p>
+      <div class="svgwrap">
+        <svg viewBox="0 0 260 180" width="260" height="180" aria-hidden="true">
+          <!-- Simple L-shape: top 7.6m, right 4.3m, bottom 5.3m, left 2.8m -->
+          <polyline points="40,40 220,40 220,150 140,150 140,100 40,100 40,40"
+                    fill="#e5e7eb" stroke="#475569" stroke-width="2"/>
+          <!-- dimension labels -->
+          <text x="130" y="30" class="dim-label">7.6 m</text>
+          <text x="230" y="95" transform="rotate(-90 230 95)" class="dim-label">4.3 m</text>
+          <text x="90" y="160" class="dim-label">5.3 m</text>
+          <text x="30" y="70" transform="rotate(-90 30 70)" class="dim-label">2.8 m</text>
+        </svg>
+      </div>
+      <p>Akeem buys the wooden flooring in packs. Each pack covers an area of <b>0.4&nbsp;m²</b>. He can cut and join the flooring.</p>
+      <p>(a) Work out the total floor area of the room.</p>
+      <p>Floor area: <input id="B3_area" type="text" size="8" /> m²</p>
+      <p>(b) Work out the number of packs of flooring Akeem needs to buy.</p>
+      <p>Packs: <input id="B3_packs" type="number" /></p>
+    </div>
+  </div>
+</section>
+
+<section id="B4" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B4 — Bearings & probability <span class="badge">[3 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Jared has part of a map.</p>
+      <div class="svgwrap">
+        <img src="https://github.com/mathbase1/FS-L1/blob/main/B4a.png?raw=true"
+             alt="Map showing hostel and cave with north arrows"
+             style="max-width:100%;height:auto;border:1px solid var(--border);border-radius:.4rem;">
+      </div>
+      <p>(a) Write down the <b>bearing</b> of the cave from the hostel. Remember the units.</p>
+      <p>Bearing: <input id="B4_bearing" type="text" placeholder="e.g. 095°" size="8" /></p>
+      <p>Jared goes to the cave on Friday. The probability that the weather is sunny is <b>7/10</b>.</p>
+      <p>(b) Mark this probability with a cross (×) on the scale below.</p>
+      <div class="svgwrap">
+        <!-- clickable 0–1 scale -->
+        <svg id="B4scale" viewBox="0 0 260 60" width="260" height="60"
+             aria-label="Probability scale from 0 to 1 with equally spaced vertical lines"></svg>
+      </div>
+      <p class="muted">Click one of the vertical lines to place a cross.</p>
+    </div>
+  </div>
+</section>
+
+<section id="B5" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B5 — Draw a bar chart (interactive) <span class="badge">[3 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Jesse is the head of sport at a college. He has data about the number of students studying sport for five academic years.</p>
+      <table style="max-width:480px">
+        <thead>
+          <tr><th>Academic year</th><th>15/16</th><th>16/17</th><th>17/18</th><th>18/19</th><th>19/20</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Number of students</td><td>34</td><td>46</td><td>82</td><td>98</td><td>70</td></tr>
+        </tbody>
+      </table>
+      <p>Use the interactive bar chart. Drag each bar up or down to match the number of students in that year.</p>
+      <div class="svgwrap">
+        <svg id="b5svg" viewBox="0 0 760 360" width="740" height="360" aria-label="interactive bar chart"></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="B6" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B6 — Swimming pool volume & chlorine rule <span class="badge">[6 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Zelda works in a spa. She takes care of the swimming pool.</p>
+      <p>The pool is a cuboid. The water level is <b>0.3 m</b> below the top.</p>
+      <ul>
+        <li>Length: <b>20 m</b></li>
+        <li>Width: <b>10 m</b></li>
+        <li>Total depth: <b>1.8 m</b></li>
+      </ul>
+      <p>Zelda knows <b>1 m³ = 1000 litres</b>.</p>
+      <p>To work out how much chlorine powder she needs, she uses:</p>
+      <p class="muted"><i>volume of water (litres) &rarr; divide by 5000 &rarr; multiply by 56 &rarr; chlorine powder needed (grams)</i></p>
+      <p>(a) Work out the volume of water in the pool in <b>m³</b>.</p>
+      <p>Volume of water: <input id="B6_volm3" type="text" size="8" /> m³</p>
+      <p>(b) Work out how much chlorine powder Zelda needs.</p>
+      <p>Chlorine powder: <input id="B6_chlorine" type="text" size="8" /> g</p>
+    </div>
+  </div>
+</section>
+
+<section id="B7" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B7 — Scale, symmetry & height of a building <span class="badge">[3 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Tom looks at a map.</p>
+      <ul>
+        <li><b>1 cm</b> on the map represents <b>3 km</b> on the ground.</li>
+        <li>The distance between two cities on the map is <b>5 cm</b>.</li>
+      </ul>
+      <p>(a) Work out the actual distance between the two cities.</p>
+      <p>Distance: <input id="B7_dist" type="number" /> km</p>
+      <p>(b) How many lines of symmetry does a square have?</p>
+      <p><input id="B7_sym" type="number" /></p>
+      <p>(c) The front elevation of a building has several heights marked.</p>
+      <div class="svgwrap">
+        <img src="https://github.com/mathbase1/FS-L1/blob/main/B7c.png?raw=true"
+             alt="Front elevation of a building with heights 34.9 m, 33.6 m, 27.4 m, 25.8 m and 2.1 m marked"
+             style="max-width:100%;height:auto;border:1px solid var(--border);border-radius:.4rem;">
+      </div>
+      <p>What is the <b>greatest</b> height of the building?</p>
+      <p>Greatest height: <input id="B7_height" type="text" size="8" /> m</p>
+    </div>
+  </div>
+</section>
+
+<section id="B8" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B8 — Perimeter of a triangular flower bed <span class="badge">[3 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Maya designs a flower bed. The sides are:</p>
+      <ul>
+        <li><b>120 cm</b></li>
+        <li><b>180 cm</b></li>
+        <li><b>215 cm</b></li>
+      </ul>
+      <p>(a) Work out the total length of edging that Maya needs.</p>
+      <p>Total edging length: <input id="B8_perim" type="number" /> cm</p>
+      <p>(b) Choose a valid check for your answer.</p>
+      <p>
+        <select id="B8_check">
+          <option value=""></option>
+          <option value="c1">120 + 180 = 300, then 300 + 215 = 515</option>
+          <option value="c2">215 &minus; 120 = 95</option>
+          <option value="c3">180 &times; 215 = 38700</option>
+        </select>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="B9" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B9 — Mean cost of unsold sandwiches <span class="badge">[4 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Tim makes sandwiches in a café. Unsold sandwiches last week:</p>
+      <table style="max-width:520px">
+        <thead>
+          <tr><th>Day</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Number unsold</td><td>15</td><td>26</td><td>9</td><td>11</td><td>20</td><td>16</td><td>1</td></tr>
+        </tbody>
+      </table>
+      <p>The cost of making each sandwich is <b>£1.95</b>.</p>
+      <p>Tim thinks the mean cost of making the sandwiches he did not sell last week was <b>more than £25 per day</b>.</p>
+      <p>(a) Total number of unsold sandwiches: <input id="B9_total" type="number" /></p>
+      <p>(b) Mean cost of unsold sandwiches per day: £ <input id="B9_mean" type="text" size="8" /></p>
+      <p>(c) Is Tim correct?</p>
+      <p>
+        <select id="B9_correct">
+          <option value=""></option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="B10" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B10 — Grouped frequency table (treadmills) <span class="badge">[3 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Colin has this data about the number of treadmills in several gyms.</p>
+      <p><b>6 &nbsp; 11 &nbsp; 5 &nbsp; 12 &nbsp; 7 &nbsp; 15 &nbsp; 13 &nbsp; 4 &nbsp; 8 &nbsp; 10 &nbsp; 12 &nbsp; 14</b></p>
+      <p>He uses three groups of equal size.</p>
+      <table style="max-width:420px">
+        <thead>
+          <tr><th>Number of treadmills</th><th>Frequency</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 to 5</td>
+            <td><input id="B10_f1" type="number" /></td>
+          </tr>
+          <tr>
+            <td>6 to 10</td>
+            <td><input id="B10_f2" type="number" /></td>
+          </tr>
+          <tr>
+            <td>11 to 15</td>
+            <td><input id="B10_f3" type="number" /></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted">In the exam you would also draw tallies. Here we just enter the frequencies.</p>
+    </div>
+  </div>
+</section>
+
+<section id="B11" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead">
+      <h3>B11 — Comparing two percentage offers <span class="badge">[5 marks]</span></h3>
+      <span class="tag calc">CALC</span>
+    </div>
+    <div class="qbody">
+      <button type="button" class="fs-open">Formula sheet</button>
+      <p>Ashley wants to buy a wall clock. She finds these two offers.</p>
+      <ul>
+        <li><b>Offer A</b>: normal price £31.80, now <b>45% off</b> the normal price.</li>
+        <li><b>Offer B</b>: normal price £34.50, now <b>half price</b>.</li>
+      </ul>
+      <p>Ashley thinks she will save <b>less than 50p</b> if she uses offer B rather than offer A.</p>
+      <p>(a) Price using offer A: £ <input id="B11_priceA" type="text" size="8" /></p>
+      <p>(b) Price using offer B: £ <input id="B11_priceB" type="text" size="8" /></p>
+      <p>(c) Difference in price between the two offers (A minus B): £ <input id="B11_diff" type="text" size="8" /></p>
+      <p>(d) Is Ashley correct?</p>
+      <p>
+        <select id="B11_correct">
+          <option value=""></option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+
+<section id="results" class="page" role="tabpanel">
+  <div class="qpanel">
+    <div class="qhead"><h3>Results &amp; heat map</h3></div>
+    <div class="qbody">
+      <div class="actions" style="margin-bottom:.8rem;">
+        <button class="primary" id="markAllBtn">Mark all questions</button>
+        <button id="dlPNG">Download heat map (PNG)</button>
+        <button id="dlPDF">Download heat map (PDF)</button>
+      </div>
+      <p><b>Total score:</b>
+        <span id="totalscore" style="font-weight:700">0</span> /
+        <span id="totalmax" style="font-weight:700">0</span>
+      </p>
+      <p><b>Diagnostic judgement:</b> <span id="grade" style="font-weight:700">—</span></p>
+
+      <div id="heatSection">
+        <div id="nextAdvice" style="display:none;margin:.9rem 0 .4rem;padding:.65rem .75rem;background:#f8fafc;border:1px solid var(--border);border-radius:.6rem;">
+          <b>Next steps:</b> Look for topics marked
+          <span class="mark-red" style="padding:.1rem .35rem;border-radius:.35rem">Needs work</span> or
+          <span class="mark-orange" style="padding:.1rem .35rem;border-radius:.35rem">Close</span>
+          and practise similar questions.
+        </div>
+
+        <h4 style="margin:.9rem 0 .5rem">Topic heat map</h4>
+        <table class="heat">
+          <thead>
+            <tr>
+              <th style="width:90px">Question</th>
+              <th>Topic</th>
+              <th style="width:120px">Marks</th>
+              <th style="width:130px">Status</th>
+              <th style="width:260px">Correct answer(s)</th>
+            </tr>
+          </thead>
+          <tbody id="heatBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- INTRO MODAL -->
+<div id="introModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+  <div class="panel">
+    <h2 id="introTitle">Edexcel FS Maths L1 — Past Paper 10 (Interactive)</h2>
+    <p>This recreates the real paper: <b>Section A (Non‑calculator)</b> then <b>Section B (Calculator)</b>.</p>
+    <div class="warn">
+      <b>Timing option:</b> you can sit this with a timer.  
+      When the timer finishes, the quiz will <b>auto‑mark</b> and answers will be <b>locked</b>.
+    </div>
+    <h3>Timing</h3>
+    <div class="row" style="margin:.4rem 0 .6rem">
+      <label class="radio"><input type="radio" name="timing" value="timer" id="optTimer"> Use a timer</label>
+      <label class="radio"><input type="radio" name="timing" value="notimer" id="optNoTimer" checked> No time limit</label>
+    </div>
+    <div class="row" id="timerRow" style="display:none">
+      <label for="minutes">Minutes (whole paper: around 115 minutes in real exam):</label>
+      <input type="number" id="minutes" min="1" step="1" placeholder="e.g. 115">
+    </div>
+    <div class="row">
+      <button class="primary" id="startBtn">Start</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULA SHEET MODAL -->
+<div id="fsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="fsTitle">
+  <div class="panel">
+    <button id="fsClose" class="primary" type="button" aria-label="Close formula sheet">Close</button>
+    <h2 id="fsTitle">Functional Skills L1 — Helpful facts &amp; formulae</h2>
+    <p class="fs-note">Use these facts where appropriate. You should still show working.</p>
+    <div id="fsGrid">
+      <div>
+        <div class="box">
+          <h4>Percentages, ratio &amp; proportion</h4>
+          <ul>
+            <li><b>Percentage of an amount</b>: multiply by <code>rate ÷ 100</code>. 20% of £P = 0.20 × P.</li>
+            <li><b>Increase/decrease</b>: new = original × (1 ± rate ÷ 100).</li>
+            <li><b>Sharing a ratio a:b</b> of total T: part<sub>a</sub> = T × a ÷ (a + b).</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h4>Measures &amp; units</h4>
+          <ul>
+            <li>1 kg = 1000 g, &nbsp; 1 L = 1000 cm³, &nbsp; 1 m³ = 1000 L.</li>
+            <li><b>Perimeter (rectangle/triangle)</b> = sum of all side lengths.</li>
+            <li><b>Area (rectangle)</b> = length × width.</li>
+            <li><b>Volume (cuboid)</b> = length × width × height.</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h4>Time &amp; data</h4>
+          <ul>
+            <li>1 h = 60 min. Convert everything to minutes when adding times.</li>
+            <li><b>Mean</b> = total ÷ number. <b>Range</b> = biggest − smallest.</li>
+            <li>Probabilities are between 0 and 1 and usually sum to 1.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box">
+        <h4>Geometry reminders</h4>
+        <ul>
+          <li>Angles around a point sum to 360°.</li>
+          <li>Bearings: measured clockwise from North, written as 3‑digit numbers (e.g. 095°).</li>
+          <li>Scale: actual = map × scale factor, or map = actual ÷ scale factor.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const asNum = v => {
+  if (v === undefined || v === null) return NaN;
+  const s = String(v).replace(/,/g,'').trim();
+  if (s.includes('/') && !s.match(/[a-zA-Z]/)) {
+    const [n,d] = s.split('/').map(Number);
+    if (!Number.isNaN(n) && !Number.isNaN(d) && d !== 0) return n/d;
+  }
+  const cleaned = s.replace(/[^\d.+-]/g,'');
+  const x = parseFloat(cleaned);
+  return Number.isFinite(x) ? x : NaN;
+};
+const eqTol = (given, correct, tol=0.01) => {
+  const x = asNum(given);
+  if (!Number.isFinite(x)) return false;
+  return Math.abs(x - correct) <= tol;
+};
+const pad2 = n => String(n).padStart(2,'0');
+
+/* ---------- tabs ---------- */
+const tabs = [...document.querySelectorAll('#tabbar button')];
+const pages = [...document.querySelectorAll('section.page')];
+function showTab(id){
+  tabs.forEach(btn => {
+    const on = btn.dataset.target === id;
+    btn.classList.toggle('active', on);
+    if(on) btn.setAttribute('aria-selected','true');
+    else btn.removeAttribute('aria-selected');
+  });
+  pages.forEach(sec => sec.classList.toggle('active', sec.id === id));
+  localStorage.setItem('fsL1_paper10_currentTab', id);
+}
+tabs.forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.target)));
+const lastTab = localStorage.getItem('fsL1_paper10_currentTab');
+if (lastTab && document.getElementById(lastTab)) showTab(lastTab); else showTab('A1');
+
+/* ---------- intro modal + timer ---------- */
+const introModal = $('introModal');
+const optTimer = $('optTimer');
+const optNoTimer = $('optNoTimer');
+const timerRow = $('timerRow');
+const startBtn = $('startBtn');
+const timerPill = $('timerPill');
+let countdown = null, endAt = 0, autoMarked = false;
+
+function showIntro(){ introModal.style.display = 'flex'; }
+function hideIntro(){ introModal.style.display = 'none'; }
+
+optTimer.addEventListener('change', () => {
+  timerRow.style.display = optTimer.checked ? 'flex' : 'none';
+});
+optNoTimer.addEventListener('change', () => {
+  timerRow.style.display = 'none';
+});
+
+function updateTimer(){
+  const remain = Math.max(0, Math.floor((endAt - Date.now()) / 1000));
+  if (remain > 0){
+    const mm = pad2(Math.floor(remain/60));
+    const ss = pad2(remain % 60);
+    timerPill.textContent = `⏱ ${mm}:${ss}`;
+  } else {
+    clearInterval(countdown); countdown = null;
+    timerPill.classList.add('up');
+    timerPill.textContent = '⏱ Time up — results ready';
+    if (!autoMarked){
+      autoMarked = true;
+      lockPaper();
+      doMarkAll();
+    }
+  }
+}
+function startTimer(minutes){
+  if (countdown) clearInterval(countdown);
+  const secs = Math.max(1, Math.floor(minutes*60));
+  endAt = Date.now() + secs*1000;
+  timerPill.style.display = 'block';
+  updateTimer();
+  countdown = setInterval(updateTimer, 250);
+}
+startBtn.addEventListener('click', () => {
+  if (optTimer.checked){
+    const mins = parseInt($('minutes').value, 10);
+    if (!Number.isFinite(mins) || mins <= 0){
+      $('minutes').value = '';
+      $('minutes').focus();
+      return;
+    }
+    startTimer(mins);
+  } else {
+    timerPill.style.display = 'none';
+    if (countdown){ clearInterval(countdown); countdown = null; }
+  }
+  hideIntro();
+  showTab('A1');
+});
+showIntro();
+
+/* ---------- lock inputs after marking ---------- */
+function lockPaper(){
+  document.querySelectorAll('input,select,textarea,button').forEach(el => {
+    const allow = (
+      el.id === 'dlPNG' ||
+      el.id === 'dlPDF' ||
+      el.id === 'fsClose' ||
+      el.classList.contains('fs-open') ||
+      el.closest('#tabbar')
+    );
+    if (!allow) el.disabled = true;
+  });
+}
+
+/* ---------- time parser (A2) ---------- */
+function parseTimeString(str){
+  if(!str) return null;
+  str = String(str).trim().toLowerCase();
+  let am=false, pm=false;
+  if (str.endsWith('am')){ am = true; str = str.replace(/am$/,'').trim(); }
+  if (str.endsWith('pm')){ pm = true; str = str.replace(/pm$/,'').trim(); }
+  // simple "2" or "14"
+  if (/^\d{1,2}$/.test(str)){
+    let h = parseInt(str,10), m = 0;
+    if (pm && h < 12) h += 12;
+    if (am && h === 12) h = 0;
+    return {h,m};
+  }
+  const m = str.match(/^(\d{1,2}):(\d{1,2})$/);
+  if (m){
+    let h = parseInt(m[1],10), mins = parseInt(m[2],10);
+    if (pm && h < 12) h += 12;
+    if (am && h === 12) h = 0;
+    return {h, m: mins};
+  }
+  return null;
+}
+
+/* ---------- interactive bar chart for B5 ---------- */
+const b5Targets = [34,46,82,98,70];
+const b5Cats   = ['15/16','16/17','17/18','18/19','19/20'];
+const b5Values = [0,0,0,0,0]; // user-chosen
+(function setupB5(){
+  const svg = $('b5svg');
+  if (!svg) return;
+  const W = 760, H = 360, left = 60, right = 20, top = 20, bottom = 50;
+  const plotW = W - left - right, plotH = H - top - bottom;
+  const maxVal = Math.max(...b5Targets);
+  const yMax = Math.ceil(maxVal*1.15/10)*10;
+  const xStep = plotW / b5Cats.length;
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function line(x1,y1,x2,y2,opts={}){
+    const el = document.createElementNS(ns,'line');
+    el.setAttribute('x1',x1); el.setAttribute('y1',y1);
+    el.setAttribute('x2',x2); el.setAttribute('y2',y2);
+    el.setAttribute('stroke',opts.stroke||'#111');
+    el.setAttribute('stroke-width',opts.w||1);
+    if (opts.dash) el.setAttribute('stroke-dasharray',opts.dash);
+    return el;
+  }
+  function text(x,y,str,opts={}){
+    const el = document.createElementNS(ns,'text');
+    el.setAttribute('x',x); el.setAttribute('y',y);
+    if (opts.align) el.setAttribute('text-anchor',opts.align);
+    if (opts.rotate) el.setAttribute('transform',`rotate(${opts.rotate} ${x} ${y})`);
+    el.textContent = str;
+    return el;
+  }
+  function rect(x,y,w,h){
+    const el = document.createElementNS(ns,'rect');
+    el.setAttribute('x',x); el.setAttribute('y',y);
+    el.setAttribute('width',w); el.setAttribute('height',h);
+    el.setAttribute('fill','#bfdbfe'); el.setAttribute('stroke','#475569');
+    return el;
+  }
+  function circle(x,y,r){
+    const el = document.createElementNS(ns,'circle');
+    el.setAttribute('cx',x); el.setAttribute('cy',y);
+    el.setAttribute('r',r); el.setAttribute('fill','#111');
+    el.classList.add('handle');
+    return el;
+  }
+  const bars=[], handles=[], labels=[];
+  svg.appendChild(line(left,top,left,H-bottom));
+  svg.appendChild(line(left,H-bottom,W-right,H-bottom));
+  // horizontal grid / y labels
+  for (let yv = 0; yv <= yMax; yv += Math.ceil(yMax/5)){
+    const ypx = H-bottom - (yv/yMax)*plotH;
+    svg.appendChild(line(left, ypx, W-right, ypx, {stroke:'#e5e7eb'}));
+    svg.appendChild(text(left-8, ypx+4, yv, {align:'end'}));
+  }
+  svg.appendChild(text(W/2, H-12, 'Academic year', {align:'middle'}));
+  svg.appendChild(text(16, H/2, 'Number of students', {align:'middle', rotate:-90}));
+
+  for (let i=0;i<b5Cats.length;i++){
+    const x = left + i*xStep + xStep*0.15;
+    const barW = xStep*0.7;
+    const baseY = H-bottom;
+    const bar = rect(x, baseY, barW, 0); svg.appendChild(bar); bars.push(bar);
+    svg.appendChild(text(x+barW/2, H-bottom+18, b5Cats[i], {align:'middle'}));
+    const h = circle(x+barW/2, baseY, 6); svg.appendChild(h); handles.push(h);
+    const lab = text(x+barW/2, baseY-6, '0', {align:'middle'}); svg.appendChild(lab); labels.push(lab);
+  }
+
+  function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
+  let dragging = -1;
+  svg.addEventListener('mousedown', e => {
+    const idx = handles.indexOf(e.target);
+    if (idx >= 0) dragging = idx;
+  });
+  svg.addEventListener('mouseup', () => dragging = -1);
+  svg.addEventListener('mouseleave', () => dragging = -1);
+  svg.addEventListener('mousemove', e => {
+    if (dragging < 0) return;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const ctm = svg.getScreenCTM().inverse();
+    const sp = pt.matrixTransform(ctm);
+    const y = clamp(sp.y, top, H-bottom);
+    const height = (H-bottom) - y;
+    const bar = bars[dragging];
+    const x = parseFloat(bar.getAttribute('x'));
+    const w = parseFloat(bar.getAttribute('width'));
+    bar.setAttribute('y', H-bottom-height);
+    bar.setAttribute('height', height);
+    const handle = handles[dragging];
+    handle.setAttribute('cx', x+w/2);
+    handle.setAttribute('cy', H-bottom-height);
+    const value = Math.round((height/plotH)*yMax);
+    b5Values[dragging] = value;
+    const lab = labels[dragging];
+    lab.setAttribute('x', x+w/2);
+    lab.setAttribute('y', H-bottom-height-6);
+    lab.textContent = value;
+  });
+})();
+
+/* ---------- B4 probability scale (clickable) ---------- */
+let B4_probChoice = null;
+
+(function setupB4Scale(){
+  const svg = $('B4scale');
+  if (!svg) return;
+  const ns = 'http://www.w3.org/2000/svg';
+  const W = 260, H = 60, left = 30, right = 30, yMid = 26;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  function makeLine(x1,y1,x2,y2){
+    const el = document.createElementNS(ns,'line');
+    el.setAttribute('x1',x1); el.setAttribute('y1',y1);
+    el.setAttribute('x2',x2); el.setAttribute('y2',y2);
+    el.setAttribute('stroke','#111'); el.setAttribute('stroke-width','1.5');
+    return el;
+  }
+
+  // baseline
+  svg.appendChild(makeLine(left, yMid, W-right, yMid));
+
+  // cross marker (moved when user clicks)
+  const cross = document.createElementNS(ns,'text');
+  cross.setAttribute('y', yMid - 12);
+  cross.setAttribute('text-anchor','middle');
+  cross.setAttribute('font-size','16');
+  cross.textContent = 'x';
+  cross.style.pointerEvents = 'none';
+  cross.style.display = 'none';
+  svg.appendChild(cross);
+
+  const usableW = W - left - right;
+
+  for (let i = 0; i <= 10; i++){
+    const x = left + usableW * (i/10);
+    const tick = makeLine(x, yMid-12, x, yMid+12);
+    tick.classList.add('tick');
+    svg.appendChild(tick);
+
+    if (i === 0 || i === 10){
+      const lab = document.createElementNS(ns,'text');
+      lab.setAttribute('x', x);
+      lab.setAttribute('y', yMid + 22);
+      lab.setAttribute('text-anchor','middle');
+      lab.textContent = i === 0 ? '0' : '1';
+      svg.appendChild(lab);
+    }
+
+    tick.addEventListener('click', () => {
+      B4_probChoice = i / 10;
+      cross.setAttribute('x', x);
+      cross.style.display = 'block';
+    });
+  }
+})();
+
+/* ---------- marking functions ---------- */
+
+/* A1 */
+function markA1(){
+  let m = 0;
+  const count = $('A1_count').value;
+  if (eqTol(count,129,0.5)) m += 2;
+  else {
+    const n = asNum(count);
+    if (Number.isFinite(n) && n > 100) m += 1; // some credit
+  }
+  const dec = ($('A1_correct').value || '').toLowerCase();
+  if (dec === 'yes') m += 1;
+  return m;
+}
+
+/* A2 */
+function markA2(){
+  let m = 0;
+  const parsed = parseTimeString($('A2_time').value);
+  const day = ($('A2_day').value || '').toLowerCase();
+  if (parsed && parsed.h === 14 && parsed.m === 0) m += 2;
+  const dayOk = day.startsWith('w'); // Wednesday
+  if (dayOk) m += 1;
+  return m;
+}
+
+/* A3 */
+function markA3(){
+  let m = 0;
+  if (eqTol($('A3_range').value,278,0.5)) m += 2;
+  if (eqTol($('A3_round').value,4.7,0.05)) m += 1;
+  if (eqTol($('A3_grams').value,900,0.5)) m += 1;
+  return m;
+}
+
+/* A4 */
+function markA4(){
+  let m = 0;
+  const g = asNum($('A4_guests').value);
+  if (Number.isFinite(g)){
+    if (g >= 300 && g <= 380) m += 3;        // good estimate (e.g. 300, 360, 374)
+    else if (g >= 200 && g <= 450) m += 2;   // rough
+    else if (g > 0) m += 1;                  // some attempt
+  }
+  if ($('A4_check').value === 'rev2') m += 1; // divide by 3 then ×5
+  return m;
+}
+
+/* B1 */
+function markB1(){
+  let m = 0;
+  const aOk = eqTol($('B1_A_profit').value,750000,0.5);
+  const cOk = eqTol($('B1_C_profit').value,725000,0.5);
+  if (aOk || cOk) m += 1;
+  if ($('B1_most').value === 'A') m += 1;
+  // part (b)
+  const orderStr = $('B1_order').value;
+  const parts = String(orderStr).split(/[, ]+/).filter(s=>s.length>0).map(asNum);
+  const correct = [2.39,2.41,2.89,2.9,3.09];
+  let ok=true;
+  if (parts.length !== correct.length) ok=false;
+  else{
+    for(let i=0;i<correct.length;i++){
+      if (Math.abs(parts[i]-correct[i])>0.01){ ok=false; break; }
+    }
+  }
+  if (ok) m += 1;
+  return m;
+}
+
+/* B2 */
+function markB2(){
+  let m = 0;
+  if (eqTol($('B2_A_wins').value,54,0.1)) m += 1;
+  if (eqTol($('B2_S_wins').value,44,0.1)) m += 1;
+  const a = asNum($('B2_A_wins').value);
+  const s = asNum($('B2_S_wins').value);
+  const diffField = $('B2_diff').value;
+  if (eqTol(diffField,10,0.1) || (Number.isFinite(a) && Number.isFinite(s) && Math.abs((a-s)-10)<=0.1)) m += 1;
+  const dec = ($('B2_correct').value || '').toLowerCase();
+  if (dec === 'no') m += 1;
+  return m;
+}
+
+/* B3 */
+function markB3(){
+  let m = 0;
+  if (eqTol($('B3_area').value,29.23,0.1)) m += 3;
+  const packs = asNum($('B3_packs').value);
+  if (packs === 74) m += 2;
+  else if (packs >= 70 && packs <= 78) m += 1;
+  return m;
+}
+
+/* B4 */
+function markB4(){
+  let m = 0;
+  const bearingVal = asNum($('B4_bearing').value);
+  if (Number.isFinite(bearingVal)){
+    if (Math.abs(bearingVal-95) <= 2) m += 2; // (0)95° ±2°
+    else if (bearingVal>=0 && bearingVal<=360) m += 1;
+  }
+  if (B4_probChoice !== null && Math.abs(B4_probChoice - 0.7) < 1e-6) {
+    m += 1;
+  }
+  return m;
+}
+
+/* B5 */
+function markB5(){
+  let close = 0;
+  for (let i=0;i<b5Targets.length;i++){
+    if (Math.abs((b5Values[i]||0) - b5Targets[i]) <= 2) close++;
+  }
+  if (close === b5Targets.length) return 3;
+  if (close >= 3) return 2;
+  if (close >= 2) return 1;
+  return 0;
+}
+
+/* B6 */
+function markB6(){
+  let m = 0;
+  if (eqTol($('B6_volm3').value,300,0.5)) m += 2;
+  const chl = $('B6_chlorine').value;
+  if (eqTol(chl,3360,1)) m += 4;
+  else if (asNum(chl) > 0) m += 2;
+  return m;
+}
+
+/* B7 */
+function markB7(){
+  let m = 0;
+  if (eqTol($('B7_dist').value,15,0.1)) m += 1;
+  if (eqTol($('B7_sym').value,4,0.1)) m += 1;
+  if (eqTol($('B7_height').value,27.4,0.1)) m += 1;
+  return m;
+}
+
+/* B8 */
+function markB8(){
+  let m = 0;
+  const per = $('B8_perim').value;
+  if (eqTol(per,515,1)) m += 2;
+  else if (asNum(per) > 0) m += 1;
+  if ($('B8_check').value === 'c1') m += 1;
+  return m;
+}
+
+/* B9 */
+function markB9(){
+  let m = 0;
+  if (eqTol($('B9_total').value,98,0.5)) m += 1;
+  if (eqTol($('B9_mean').value,27.3,0.2)) m += 2;
+  const dec = ($('B9_correct').value || '').toLowerCase();
+  if (dec === 'yes') m += 1;
+  return m;
+}
+
+/* B10 */
+function markB10(){
+  const f1 = asNum($('B10_f1').value);
+  const f2 = asNum($('B10_f2').value);
+  const f3 = asNum($('B10_f3').value);
+  let correct = 0;
+  if (f1 === 2) correct++;
+  if (f2 === 4) correct++;
+  if (f3 === 6) correct++;
+  if (correct === 3) return 3;
+  if (correct === 2) return 2;
+  if (correct === 1) return 1;
+  return 0;
+}
+
+/* B11 */
+function markB11(){
+  let m = 0;
+  if (eqTol($('B11_priceA').value,17.49,0.02)) m += 2;
+  if (eqTol($('B11_priceB').value,17.25,0.02)) m += 1;
+  if (eqTol($('B11_diff').value,0.24,0.02) || eqTol($('B11_diff').value,24,0.5)) m += 1; // £0.24 or 24p
+  const dec = ($('B11_correct').value || '').toLowerCase();
+  if (dec === 'yes') m += 1;
+  return m;
+}
+
+/* ---------- Heat map config ---------- */
+
+const questions = [
+   {code:'A1', topic:'Holiday survey – 15% of 860', max:3, markFn:markA1,
+   correct:'15% of 860 = 129 people; Samira is correct.[MF7.15]'},
+  {code:'A2', topic:'Time – 12‑hour shift then 30 hours off', max:3, markFn:markA2,
+   correct:'Second shift starts Wednesday at 14:00 (2 pm).[MF37.09]'},
+  {code:'A3', topic:'Range, rounding & unit conversion', max:4, markFn:markA3,
+   correct:'Range 394−116 = 278; 4.749 → 4.7 (1 d.p.); 0.9 kg = 900 g.[MD6.03]'},
+  {code:'A4', topic:'Ratio & estimation with reverse check', max:4, markFn:markA4,
+   correct:'About 3⁄5 of 624 ≈ 360 guests (any sensible estimate around 360); reverse check: answer ÷ 3 × 5 ≈ 624.[MF15.01]'},
+
+  {code:'B1', topic:'Company profits & ordering decimals', max:3, markFn:markB1,
+   correct:'A: £750,000; B: £648,900; C: £725,000 → most profit: Company A. Order: 2.39, 2.41, 2.89, 2.9, 3.09.[MF2.09]'},
+  {code:'B2', topic:'Percentages of games won & comparison', max:4, markFn:markB2,
+   correct:'Alex wins 54 games; Seamus 44; difference 10 → Alex is not correct.[MD4.08]'},
+  {code:'B3', topic:'Area of L‑shaped floor & packs', max:5, markFn:markB3,
+   correct:'Area = 2.8×2.3 + 5.3×4.3 = 29.23 m²; packs = 29.23 ÷ 0.4 ≈ 73.1 → 74 packs.[MD12.04]'},
+  {code:'B4', topic:'Bearing & probability 7⁄10', max:3, markFn:markB4,
+   correct:'Bearing of cave from hostel ≈ 095°; probability = 7⁄10 = 0.7 (click at 0.7 on the scale).[MF46.02]'},
+  {code:'B5', topic:'Bar chart – sport students by year', max:3, markFn:markB5,
+   correct:'Bar heights: 34, 46, 82, 98, 70 students (years 15/16 to 19/20).[MF50.04]'},
+  {code:'B6', topic:'Swimming pool volume & chlorine', max:6, markFn:markB6,
+   correct:'Water depth = 1.8 − 0.3 = 1.5 m; volume = 20×10×1.5 = 300 m³ = 300,000 L; chlorine = 300,000 ÷ 5000 × 56 = 3360 g.[MF34.02]'},
+  {code:'B7', topic:'Map scale, symmetry & building height', max:3, markFn:markB7,
+   correct:'Distance = 5×3 = 15 km; square has 4 lines of symmetry; greatest height = 27.4 m.[MD10.09]'},
+  {code:'B8', topic:'Perimeter of triangular flower bed', max:3, markFn:markB8,
+   correct:'Perimeter = 120 + 180 + 215 = 515 cm; check e.g. 515 − 215 = 300.[MF30.07]'},
+  {code:'B9', topic:'Mean cost of unsold sandwiches', max:4, markFn:markB9,
+   correct:'Total unsold = 98; mean per day = 98 ÷ 7 = 14; mean cost = 14×£1.95 = £27.30 > £25 → Tim is correct.[MF49.03]'},
+  {code:'B10', topic:'Grouped frequency (treadmills)', max:3, markFn:markB10,
+   correct:'Frequencies: 1–5 → 2; 6–10 → 4; 11–15 → 6.[MF48.11]'},
+  {code:'B11', topic:'Comparing percentage discounts', max:5, markFn:markB11,
+   correct:'Offer A price = 31.80×0.55 = £17.49; Offer B price = £34.50 ÷ 2 = £17.25; B is cheaper by £0.24 (<50p) → Ashley is correct.[MD4.12]'}
+
+];
+
+const TOTAL_MAX = questions.reduce((s,q)=>s+q.max,0);
+$('totalmax').textContent = TOTAL_MAX;
+
+/* status helpers */
+function colourClass(score,max){
+  if (score === max) return 'mark-green';
+  if (score >= Math.ceil(max*0.6)) return 'mark-orange';
+  return 'mark-red';
+}
+function statusText(cls){
+  if (cls === 'mark-green') return 'Secure';
+  if (cls === 'mark-orange') return 'Close';
+  return 'Needs work';
+}
+function judge(total,max){
+  const p = total / max;
+  if (p >= 0.7) return 'Likely PASS (strong)';
+  if (p >= 0.6) return 'Borderline PASS';
+  if (p >= 0.5) return 'Nearly there — revise amber/red topics';
+  return 'Below pass — focus on red topics first';
+}
+
+/* render heatmap */
+function renderHeatmap(scores){
+  const body = $('heatBody');
+  body.innerHTML = '';
+  scores.forEach((score,idx)=>{
+    const q = questions[idx];
+    const cls = colourClass(score,q.max);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <th>${q.code}</th>
+      <td>${q.topic}</td>
+      <td>${score} / ${q.max}</td>
+      <td class="status ${cls}">${statusText(cls)}</td>
+      <td>${q.correct}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+/* mark-all */
+function doMarkAll(){
+  const scores = questions.map(q => q.markFn());
+  const total = scores.reduce((a,b)=>a+b,0);
+  $('totalscore').textContent = total;
+  $('grade').textContent = judge(total,TOTAL_MAX);
+  renderHeatmap(scores);
+  lockPaper();
+  $('markAllBtn').disabled = true;
+  $('markAllBtn').textContent = 'Marked';
+  $('nextAdvice').style.display = 'block';
+  showTab('results');
+}
+$('markAllBtn').addEventListener('click', doMarkAll);
+
+/* ---------- formula sheet open/close ---------- */
+(function(){
+  const fsModal = $('fsModal');
+  function openFS(){ fsModal.style.display = 'flex'; }
+  function closeFS(){ fsModal.style.display = 'none'; }
+  document.querySelectorAll('.fs-open').forEach(btn => btn.addEventListener('click', openFS));
+  $('fsClose').addEventListener('click', closeFS);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){
+      if (fsModal.style.display === 'flex') closeFS();
+      if (introModal.style.display === 'flex') hideIntro();
+    }
+  });
+})();
+
+/* ---------- heat map download (PNG / PDF) ---------- */
+function captureHeatSection(){
+  const el = document.getElementById('heatSection');
+  return html2canvas(el, {backgroundColor:'#ffffff', scale:2, useCORS:true});
+}
+$('dlPNG').addEventListener('click', () => {
+  captureHeatSection().then(canvas => {
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'FS-L1-Past-Paper-10-heatmap.png';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},500);
+    });
+  });
+});
+$('dlPDF').addEventListener('click', () => {
+  captureHeatSection().then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({orientation:'p', unit:'pt', format:'a4'});
+    const pageW = pdf.internal.pageSize.getWidth();
+    const margin = 24;
+    const imgW = pageW - margin*2;
+    const imgH = canvas.height * (imgW / canvas.width);
+    pdf.addImage(imgData,'PNG',margin,margin,imgW,imgH,undefined,'FAST');
+    pdf.save('FS-L1-Past-Paper-10-heatmap.pdf');
+  });
+});
+
+/* ---------- disable right‑click & Ctrl+U/C (optional) ---------- */
+(function(){
+  document.addEventListener('contextmenu', e => {
+    e.preventDefault();
+  }, {capture:true});
+  document.addEventListener('keydown', e => {
+    const key = (e.key || '').toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && (key === 'u' || key === 'c')){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, {capture:true});
+})();
+</script>
+
+<!-- libs for PNG/PDF capture -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+
+</body>
+</html>
 
